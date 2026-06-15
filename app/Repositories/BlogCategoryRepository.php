@@ -23,7 +23,7 @@ class BlogCategoryRepository extends CoreRepository
     {
         return $this->startConditions()->find($id);
     }
-    
+
     /**
      *  Отримати список категорій для виводу в випадаючий список
      *  @return Collection
@@ -31,5 +31,20 @@ class BlogCategoryRepository extends CoreRepository
     public function getForComboBox()
     {
         return $this->startConditions()->all();
+    }
+    /**
+     * Отримати категорії для виводу списком з пагінацією
+     * * @param int|null $perPage
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getAllWithPaginate($perPage = 25)
+    {
+        $columns = ['id', 'title', 'parent_id'];
+
+        $result = $this->startConditions()
+            ->select($columns)
+            ->paginate($perPage);
+
+        return $result;
     }
 }

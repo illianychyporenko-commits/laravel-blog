@@ -8,6 +8,7 @@ use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Models\BlogCategory;
 use Illuminate\Support\Str;
 use App\Repositories\BlogCategoryRepository;
+
 class CategoryController extends BaseController
 {
     /**
