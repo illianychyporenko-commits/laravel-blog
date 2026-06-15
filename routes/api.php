@@ -14,7 +14,11 @@ Route::group($groupData, function () {
     $methods = ['index', 'store', 'update'];
     Route::apiResource('categories', CategoryController::class)
         ->only($methods)
-        ->names('blog.admin.categories'); 
+        ->names('blog.admin.categories');
+    // BlogPost
+    Route::apiResource('posts', 'PostController')
+        ->except(['show'])
+        ->names('blog.admin.posts');
 });
 
 Route::group(['namespace' => 'App\Http\Controllers\Api\Blog', 'prefix' => 'blog'], function () {
