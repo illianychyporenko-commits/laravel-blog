@@ -122,7 +122,7 @@ class DiggingDeeperController extends Controller
         $sortedAscCollection = $collection->sortBy('created_at');
         $sortedDescCollection = $collection->sortByDesc('item_id');
 
-        dd(compact('sortedSimpleCollection', 'sortedAscCollection', 'sortedDescCollection'));
+        //dd(compact('sortedSimpleCollection', 'sortedAscCollection', 'sortedDescCollection'));
 
     }
 }
