@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Api\Blog\Admin;
 use App\Repositories\BlogPostRepository;
 use App\Repositories\BlogCategoryRepository;
 use App\Http\Requests\BlogPostUpdateRequest;
-use Illuminate\Http\Request; 
-use App\Models\BlogPost; 
+use Illuminate\Http\Request;
+use App\Models\BlogPost;
 use Illuminate\Support\Str;
+use App\Http\Requests\BlogPostCreateRequest;
 
 class PostController extends BaseController
 {
@@ -25,8 +26,18 @@ class PostController extends BaseController
     /**
      * Створення нової статті
      */
-    public function store(Request $request)
+    public function store(BlogPostCreateRequest $request)
     {
+        $data = $request->input(); //отримаємо масив даних, які надійшли з форми
+
+        $item = (new BlogPost())->create($data); //створюємо об'єкт і додаємо в БД
+
+        if ($item) {
+            return ['success' => 'Успішно збережено'];
+        } else {
+            return ['msg' => 'Помилка збереження'];
+        }
+
         $data = $request->all();
 
         if (empty($data['slug'])) {
@@ -71,6 +82,23 @@ class PostController extends BaseController
             ];
         } else {
             return ['message' => 'Помилка збереження'];
+        }
+    }
+
+    public function destroy(string $id)
+    {
+        $result = BlogPost::destroy($id);
+
+        if ($result) {
+            return [
+                'success' => true,
+                'message' => "Запис id=[{$id}] успішно видалено"
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Помилка видалення або запис не знайдено'
+            ];
         }
     }
 }
