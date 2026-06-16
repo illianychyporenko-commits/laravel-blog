@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use App\Models\BlogPost;
 use Illuminate\Support\Str;
 use App\Http\Requests\BlogPostCreateRequest;
+use App\Jobs\BlogPostAfterCreateJob;
+use App\Jobs\BlogPostAfterDeleteJob;
+use DispatchesJobs;
 
 class PostController extends BaseController
 {
@@ -28,31 +31,23 @@ class PostController extends BaseController
      */
     public function store(BlogPostCreateRequest $request)
     {
-        $data = $request->input(); //отримаємо масив даних, які надійшли з форми
-
-        $item = (new BlogPost())->create($data); //створюємо об'єкт і додаємо в БД
-
-        if ($item) {
-            return ['success' => 'Успішно збережено'];
-        } else {
-            return ['msg' => 'Помилка збереження'];
-        }
-
         $data = $request->all();
 
         if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']);
+            $data['slug'] = \Illuminate\Support\Str::slug($data['title']);
         }
 
         if (!empty($data['is_published'])) {
-            $data['published_at'] = Carbon::now();
+            $data['published_at'] = \Illuminate\Support\Carbon::now();
         }
 
-        $data['content_html'] = $data['content_raw'];
+        $data['content_html'] = $data['content_raw'] ?? '';
 
         $item = BlogPost::create($data);
 
         if ($item) {
+            BlogPostAfterCreateJob::dispatch($item);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Статтю успішно створено',
@@ -90,6 +85,9 @@ class PostController extends BaseController
         $result = BlogPost::destroy($id);
 
         if ($result) {
+
+            BlogPostAfterDeleteJob::dispatch($id)->delay(20);
+
             return [
                 'success' => true,
                 'message' => "Запис id=[{$id}] успішно видалено"

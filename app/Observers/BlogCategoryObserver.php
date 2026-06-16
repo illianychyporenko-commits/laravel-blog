@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\BlogCategory;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class BlogCategoryObserver
 {
