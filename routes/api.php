@@ -15,6 +15,7 @@ Route::group($groupData, function () {
     Route::apiResource('categories', CategoryController::class)
         ->only($methods)
         ->names('blog.admin.categories');
+    
     // BlogPost
     Route::apiResource('posts', 'PostController')
         ->except(['show'])

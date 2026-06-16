@@ -34,7 +34,7 @@ class PostController extends BaseController
         $data = $request->all();
 
         if (empty($data['slug'])) {
-            $data['slug'] = \Illuminate\Support\Str::slug($data['title']);
+            $data['slug'] = Str::slug($data['title']);
         }
 
         if (!empty($data['is_published'])) {
