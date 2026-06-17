@@ -3,32 +3,26 @@
 namespace App\Http\Controllers\Api\Blog;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\BlogPost;
 use App\Jobs\BlogPostAfterCreateJob;
 use App\Jobs\BlogPostAfterDeleteJob;
+use App\Models\BlogPost;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        $items = BlogPost::all();
+        $items = BlogPost::with(['user', 'category'])->get(); // ← додав with()
 
-        return $items;
+        return response()->json(['data' => $items]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        dd('МЕТОД СТОР ПРАЦЮЄ!');
         $data = $request->validate([
-            'title' => 'required|unique:blog_posts|max:200',
-            'slug' => 'max:200',
+            'title'       => 'required|unique:blog_posts|max:200',
+            'slug'        => 'max:200',
             'content_raw' => 'required|string',
             'category_id' => 'required|integer',
         ]);
@@ -42,29 +36,22 @@ class PostController extends Controller
         return response()->json($item, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(BlogPost $post): JsonResponse // ← BlogPost, не Post
     {
-        //
+        $post->load(['user', 'category']);
+
+        return response()->json(['data' => $post]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id): JsonResponse
     {
         //
+        return response()->json(['success' => true]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
         $item = BlogPost::findOrFail($id);
-
         $item->delete();
 
         BlogPostAfterDeleteJob::dispatch($item);
